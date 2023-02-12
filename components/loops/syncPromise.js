@@ -28,7 +28,13 @@ class syncPromiseWorker {
         this.loop.retry(this.id)
     }
     next() {
-        this.loop.next(this.id)
+        if(this.loop._gate==0) {
+            this.loop.next(this.id)
+        } else {
+            this.loop.gate(()=>{
+                this.loop.next(this.id)
+            })
+        }
     } 
     get _then() {
         return {
@@ -87,6 +93,11 @@ class syncPromise {
         this._unpause = []
         this._over = false
         this._mustEnd = []
+        this._gated = []
+        this._gate = 0
+    }
+    gate(fn) {
+        this._gated.push(fn)
     }
     assignLimit(limit) {
         Object.assign(this.limit, limit)
@@ -128,6 +139,7 @@ class syncPromise {
         return this
     }
     get rateLimitReached() {
+        this._toLimit++
         if(typeof this._tick === 'function' && this._toLimit%this.tickIntervals===0) {
             this._tick(this.data)
         }
@@ -144,6 +156,21 @@ class syncPromise {
                 this._overToPromises--
                 this.makeEndHappen()
             })
+    }
+    continueAfterResolving(promises) {
+        if(promises !== null) {
+            promises = promises.filter((x)=>{
+                return x!==null
+            })
+            this._gate++
+            Promise.all(promises).then(()=>{
+                this._gate--
+                if(this._gate<this._gated.length) {
+                    let fn = this._gated.shift()
+                    if(typeof fn == 'function') fn()
+                }
+            })
+        }
     }
     over() {
         if(this.parallelWorkers.reduce(
@@ -205,7 +232,7 @@ class syncPromise {
             this,
             i,
             this._work,
-            this._then(this)
+            this._then(this.data)
             )
     }
     loopTrought() {

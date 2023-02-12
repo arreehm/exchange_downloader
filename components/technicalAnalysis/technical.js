@@ -91,6 +91,7 @@ class technicalAnalysis {
         this.sticks = []
     }
     stick(meta, data) {
+        let r = null
         if(meta.skipped===0) {
 
             this.sticks.push({
@@ -106,7 +107,7 @@ class technicalAnalysis {
                 let TA = this.doTechnicalAnalysis()
                 let SA = this.doCandleStickAnalysis()
                 
-                this._save(
+                r = this._save(
                     {
                         openTime : data.opentime,
                         interval : meta.interval,
@@ -123,6 +124,8 @@ class technicalAnalysis {
             this.emptySticks()
 
         }
+
+        return r
         
     }
     fill(nameOfValues) {

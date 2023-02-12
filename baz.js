@@ -25,7 +25,7 @@ symbols.forEach((x)=>{
     })
 })
 // Comment line before after tests!!
-//symbolsIntervalsPairs = [['ETHBTC', '1m']]
+//symbolsIntervalsPairs = [['ENJBTC', '1m']]
 
             
 let { Client } = require('pg')
@@ -152,8 +152,7 @@ Promise.all([candles.connect(), indicators.connect()]).then(()=>{
                     +") ON CONFLICT DO NOTHING;"
                     patternRowData.unshift(meta.openTime)
                     let patternQueryPromise = indicators.query(patternQuery, patternRowData)
-                    
-                    loop._loop.mustEnd([indicatorsQueryPromise, patternQueryPromise])
+                    return ([indicatorsQueryPromise, patternQueryPromise])
                 })
 
             
@@ -163,14 +162,17 @@ Promise.all([candles.connect(), indicators.connect()]).then(()=>{
                         symbol   :   args.symbol,
                         begin    :    loop.begin,
                         end      :      loop.end,
+                        chunk    :           240,
+                        tickIntervals:         3,
                     }, candles))
-                        .setCallback((meta, stick)=>{
-                            technicalIndication.stick(meta, stick)
-                    }).tick((loop)=>{
-                        console.info(`: > : Processing sticks from ${loop.symbol} ${loop.interval} ` + (new Date(loop.openTime)).toString())
-                    }).onEnd(()=>{
-                        res()
-                    }).loop()
+                        .setCallback((loop, meta, stick)=>{
+                            let waitForEnd = technicalIndication.stick(meta, stick)
+                            loop._loop.continueAfterResolving(waitForEnd)
+                        }).tick((loop)=>{
+                            console.info(`: > : Processing sticks from ${loop.symbol} ${loop.interval} ` + (new Date(loop.openTime)).toString())
+                        }).onEnd(()=>{
+                            res()
+                        }).loop()
                 })   
         }).tick((loop)=>{
             console.info(`: > :  Currently at : `, loop.pair)

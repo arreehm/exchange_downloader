@@ -30,9 +30,9 @@ class candleStickIterator {
         return this
     }
     setCallback(cb) {
-        this.cb = (meta, data)=>{
+        this.cb = (loop, meta, data)=>{
             let r = this.verify.stick(meta, data)
-            cb(r[0], r[1])
+            cb(loop, r[0], r[1])
         }
         return this
     }
@@ -40,7 +40,7 @@ class candleStickIterator {
 
         let loo = (new syncPromise(
             (loop)=>{ 
-                loop.tickIntervals = 360
+                loop.tickIntervals = this.tickIntervals
                 loop.assignLimit({
                     parallel: 1,
                 })
@@ -65,10 +65,11 @@ class candleStickIterator {
                         data.rows.map((x)=>{
                             x.opentime = Number(x.opentime)
                             x.closetime = Number(x.closetime)
-                            this.cb({
-                                symbol: this.symbol,
-                                interval: this.interval,
-                            }, x)
+                            this.cb(
+                                loop, {
+                                    symbol: this.symbol,
+                                    interval: this.interval,
+                                }, x)
                         })
                         
                     },

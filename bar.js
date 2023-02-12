@@ -80,8 +80,7 @@ pg.connect().then(()=>{
                             x.open, x.high, x.low, x.close,
                             x.volume, x.quotevolume, x.baseassetvolume, x.quoteassetvolume
                          ]
-                loop._loop.mustEnd([pg.query(insertStick, values)])  
-                 
+                return ([pg.query(insertStick, values)])                 
             })
 
             return new Promise((res, rej)=>{
@@ -94,11 +93,13 @@ pg.connect().then(()=>{
                         .tick((loop)=>{
                             console.info(`: > : ${loop.symbol} ${loop.interval} | from time: ${new Date(loop.openTime)}`)
                         })
-                        .setCallback((meta, stick)=>{
+                        .setCallback((loop, meta, stick)=>{
                             stick.opentime  =  Number(stick.opentime)
                             stick.closetime = Number(stick.closetime)        
   
-                            stickComputer.stick(meta, stick) 
+                            let waitForEnd = stickComputer.stick(meta, stick)
+                            waitForEnd = _.flatten(waitForEnd)
+                            loop.continueAfterResolving(waitForEnd) 
                     }).onEnd(()=>{
                         res()
                     }).loop()

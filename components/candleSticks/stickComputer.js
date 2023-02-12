@@ -32,7 +32,8 @@ class stickComputer {
             })
         }
         
-        this.intervals.map((interval,i)=>{
+        return this.intervals.map((interval,i)=>{
+            let r = null
             if(interval.openTime == data.opentime) {
                 this.sticks[i].openCandle(data, interval.closeTime)
             } else {
@@ -40,7 +41,7 @@ class stickComputer {
             }
             if(interval.closeTime==data.closetime) {
                 if(this.sticks[i].opened) {
-                    this._save({
+                    r = this._save({
                         interval: interval.interval,
                         symbol: meta.symbol,
                     }, this.sticks[i].candlestick)
@@ -48,6 +49,7 @@ class stickComputer {
                 this.sticks[i].closeCandle()
                 interval.next()
             }
+            return r
         })
 
     }
