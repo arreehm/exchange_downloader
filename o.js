@@ -1,6 +1,0 @@
-let inc = require('./components/inc.js')
-let { parseIntervalStep, candleStickInterval } = inc('candleSticks/interval')
-let interval = new candleStickInterval('1M', 1577833200000)
-console.info(interval.openTime, interval.closeTime)
-interval.next()
-console.info(interval.openTime, interval.closeTime)
