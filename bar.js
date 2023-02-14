@@ -72,7 +72,7 @@ pg.connect().then(()=>{
                 // console.info(`: > : Saving stick with:`,meta, x)
                 
                 let insertStick = 'INSERT INTO candles_'+meta.interval+'_'+meta.symbol+''
-                +' (openTime, closeTime, trades, open, high, low, close, volume, qouteVolume, baseAssetVolume, qouteAssetVolume)'
+                +' (openTime, closeTime, trades, open, high, low, close, volume, quoteVolume, baseAssetVolume, quoteAssetVolume)'
                 +' VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT DO NOTHING;'
                 let values = [
                             x.opentime, x.closetime,
