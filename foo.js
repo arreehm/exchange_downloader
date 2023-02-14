@@ -13,7 +13,8 @@ let exchangeDownloader = inc('exchangeDownloadContainment/binance')
 */
 
 // let dateToBeginFetchFrom = '2019-1-1'
-let dateToBeginFetchFrom = 'Tue Jan 01 2019 00:00:00 GMT+0000'
+let dateToBeginFetchFrom = '1.1.2017 00:00:00 UTC'
+let interval = '6h'
 
 let binance = require('binance-api-node').default()
 
@@ -33,14 +34,14 @@ binance.exchangeInfo()
             
             let { Client } = require('pg')
             let pg = new Client({database: 'candles'})
-
             pg.connect().then(()=>{
+
                 console.info(`: > :   ~ Database connected ~`)
                 // Database Connection Opened
                 let createTable = Promise.all(
                     symbols
                         .map((x)=>{
-                            return `candles_1m_${x}`
+                            return `candles_${interval}_${x}`
                         })
                         .map(
                             (x)=>{
@@ -52,13 +53,14 @@ binance.exchangeInfo()
                 .then(res => {
                     let downloader = (new exchangeDownloader(
                         dateToBeginFetchFrom,
-                        symbols
+                        symbols,
+                        interval,
                     ))
                     downloader
                         .setThen((loop)=>{
                             return {
                                 resolved: (data, args)=>{
-                                    let insertStatement = 'INSERT INTO '+`candles_1m_${args.symbol}`
+                                    let insertStatement = 'INSERT INTO '+`candles_${interval}_${args.symbol}`
                                     +' (openTime, closeTime, trades, open, high, low, close, volume, quoteVolume, baseAssetVolume, quoteAssetVolume)'
                                     +' VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT DO NOTHING;'
                                     let save = data.map((x)=>{ 

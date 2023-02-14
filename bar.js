@@ -1,6 +1,6 @@
 let config = {
-    begin   :  (new Date(Date.parse('Tue Jan 01 2019 00:00:00 GMT+0000'))).getTime(),
-    end     :  (new Date(Date.parse('2023-2-1'))).getTime(),
+    begin   :  (new Date(Date.parse('01 Jan 2019 00:00:00 GMT+0000'))).getTime(),
+    end     :  (new Date(Date.parse('31 Jan 2023'))).getTime(),
     interval:           '1m',
     longer  : '3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1Mo'.split(", ")
 }
@@ -85,6 +85,7 @@ pg.connect().then(()=>{
 
             return new Promise((res, rej)=>{
                     let iterator = (new candleStickIterator({
+                        tickIntervals:       10,
                         interval : loop.interval,
                         symbol   :   args.symbol,
                         begin    :    loop.begin,
@@ -99,7 +100,7 @@ pg.connect().then(()=>{
   
                             let waitForEnd = stickComputer.stick(meta, stick)
                             waitForEnd = _.flatten(waitForEnd)
-                            loop.continueAfterResolving(waitForEnd) 
+                            loop._loop.continueAfterResolving(waitForEnd) 
                     }).onEnd(()=>{
                         res()
                     }).loop()

@@ -1,7 +1,7 @@
 let config = {
-    begin    :  (new Date(Date.parse('Tue Jan 01 2019 00:00:00 GMT+0000'))).getTime(),
-    end      :  (new Date(Date.parse('2023-2-1'))).getTime(),
-    intervals : '1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w'.split(", ")
+    begin    :  (new Date(Date.parse('1 Jan 2019 00:00:00 UTC'))).getTime(),
+    end      :  (new Date(Date.parse('31 Jan 2023 00:00:00 UTC'))).getTime(),
+    intervals : '3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w'.split(", ")
 }
 
 let inc = require('./components/inc.js')
@@ -18,15 +18,16 @@ let syncPromise = inc('loops/syncPromise')
 let fs = require('fs')
 
 let symbolsIntervalsPairs = []
+
 let symbols = JSON.parse(fs.readFileSync('./~/candlesUsed'))
+
+//symbols = ['ETHBTC', 'BNBBTC', 'LTCBTC']
 symbols.forEach((x)=>{
     config.intervals.forEach((y)=>{
         symbolsIntervalsPairs.push([x, y])
     })
 })
 // Comment line before after tests!!
-//symbolsIntervalsPairs = [['ENJBTC', '1m']]
-
             
 let { Client } = require('pg')
 let candles = new Client({database: 'candles'})
@@ -91,7 +92,7 @@ Promise.all([candles.connect(), indicators.connect()]).then(()=>{
         }).work((loop, args)=>{
 
             let technicalIndication = (new technicalIndicators({
-                length: 72,
+                length: 82,
             }))
                 .setSave((meta, ta)=>{
 
@@ -142,7 +143,7 @@ Promise.all([candles.connect(), indicators.connect()]).then(()=>{
                     })
 
 
-                    patternQuery = 'INSERT INTO '+`patterns_${meta.symbol}_${meta.interval}`+' ('
+                    let patternQuery = 'INSERT INTO '+`patterns_${meta.symbol}_${meta.interval}`+' ('
                     + '"openTime" ,'
                         + patternRowInfo.join(',')
                         + ") VALUES ($1, "+
