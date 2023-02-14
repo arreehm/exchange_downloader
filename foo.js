@@ -13,9 +13,8 @@ let exchangeDownloader = inc('exchangeDownloadContainment/binance')
 */
 
 // let dateToBeginFetchFrom = '2019-1-1'
-let dateToBeginFetchFrom = '1.1.2017 00:00:00 UTC'
+let dateToBeginFetchFrom = '01 Jan 2017 00:00:00 UTC'
 let interval = '6h'
-
 let binance = require('binance-api-node').default()
 
 binance.exchangeInfo()
