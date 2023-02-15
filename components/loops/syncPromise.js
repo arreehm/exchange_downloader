@@ -56,6 +56,7 @@ class syncPromiseWorker {
     makeWork() {
         if(!this.loop._until(this.loop.data)){
             if(!this.hasArgs) this.makeArgs()
+            this.loop.tickNow()
             this.good = false
             this._work(this.loop.data, this.__args, this)
             .then(
@@ -122,6 +123,11 @@ class syncPromise {
         this._tick = tick 
         return this
     }
+    tickNow() {
+        if(typeof this._tick === 'function' && this._toLimit%this.tickIntervals===0) {
+            this._tick(this.data)
+        }
+    }
     finish(finish) {
         this._finish = finish
         return this
@@ -140,9 +146,6 @@ class syncPromise {
     }
     get rateLimitReached() {
         this._toLimit++
-        if(typeof this._tick === 'function' && this._toLimit%this.tickIntervals===0) {
-            this._tick(this.data)
-        }
         if(this._toLimit >= this.limit.count) {
             return true
         } else {

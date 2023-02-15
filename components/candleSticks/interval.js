@@ -13,7 +13,7 @@ let parseIntervalStep = (interval) => {
         case "m":
             multiplier *= (60 * 1000) 
     }
-    r = multiplier*Number(interval.slice(0, interval.length-1).join(""))
+    let r = multiplier*Number(interval.slice(0, interval.length-1).join(""))
     return r
 }
 
@@ -29,7 +29,7 @@ class candleStickInterval {
         let diff, remainder, _moment, milliseconds
         this.moment = moment.utc(after)
         switch(this.interval) {
-            case '1Mo':
+            case '1M':
                 this.moment = this.moment.add(1, 'month')
                 this.moment.startOf('month')
                 break;
@@ -114,14 +114,7 @@ class candleStickInterval {
                 this.moment = _moment
                 break;
             case '3m':
-                milliseconds = parseIntervalStep('1Mo') 
-                diff = this.moment.diff(moment.utc().startOf('day'))
-                remainder = Math.abs(diff%milliseconds)/1000
-                _moment = this.moment.add(remainder, 'seconds')
-                this.moment = _moment
-                break;
-            case '1Mo':
-                milliseconds = parseIntervalStep('1Mo') 
+                milliseconds = parseIntervalStep('3m') 
                 diff = this.moment.diff(moment.utc().startOf('day'))
                 remainder = Math.abs(diff%milliseconds)/1000
                 _moment = this.moment.add(remainder, 'seconds')
@@ -134,9 +127,10 @@ class candleStickInterval {
         return (new Date(this.moment.utc().toString())).getTime()
     }
     get closeTime() {
+        let r
         let _moment = this.moment.clone() 
         switch(this.interval) {
-            case '1Mo':
+            case '1M':
                 r = _moment.add(1, 'month')
                 break;
             default:
@@ -150,7 +144,7 @@ class candleStickInterval {
     }
     next() {
         switch(this.interval) {
-            case '1Mo':
+            case '1M':
                 this.moment = this.moment.add(1, 'month')
                 break;
             default:

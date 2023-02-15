@@ -45,6 +45,14 @@ class argumenter {
             })
         }
 
+
+        if(typeof this._fillables[0] == 'string') this._fillables = [this._fillables]
+        this._fillables = this._fillables.map((x)=>{
+            if(x[1] instanceof Array) x[1] = 'close'
+            return x
+        })
+
+
     }
     get args() {
         let args = {}
@@ -129,6 +137,7 @@ class technicalAnalysis {
         
     }
     fill(nameOfValues) {
+        let r
         if(Object.keys(this._args).includes(nameOfValues)) {
             return this._args[nameOfValues]
         } else if (this.technicalIndicatorArgumentersMap.includes(nameOfValues)) {
@@ -151,8 +160,6 @@ class technicalAnalysis {
 
     }
     doTechnicalAnalysis() {
-        delete this.TI;
-        this.TI = require('technicalindicators')
         this.technicalIndicatorArgumenters.map((x)=>{
             this.technicalIndicator[x.for] = this.TI[x.for].calculate(x.args)
         })
@@ -186,7 +193,7 @@ class technicalAnalysis {
         this.candleStickCountForAnalysis.forEach((x)=>{
             if( !this.candleStickCountForAnalysisAll.includes(x[1]) )this.candleStickCountForAnalysisAll.push(x[1])
         })
-        let technicalIndicators = Object.entries(Args.technicalIndicators).map((ti)=>{
+        let technicalIndicators = Object.entries(Args.technicalIndicators).map((ti)=>{        
             return new argumenter(this, [ti[0], ti[1]])
         })
         this.technicalIndicatorArgumenters = technicalIndicators.sort((a, b)=>{

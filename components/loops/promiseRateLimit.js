@@ -68,7 +68,7 @@ class promiseRateLimit {
             count: 12,
             timeInterval: 1100,
             parallel: 3,
-            updateEvery: 5,
+            updateEvery: 1,
         }
         limit(this)
         this.data = {

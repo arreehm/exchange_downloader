@@ -1,15 +1,17 @@
 let inc = require('./../inc.js')
 
 let promiseRateLimit = inc('loops/promiseRateLimit')
-
+let intervalStep = inc('candleSticks/interval').parseIntervalStep
 
 const Binance = require('binance-api-node').default
 const client = Binance()
 
 class exchangeDownloader {
-    constructor(date, symbols) {
+    constructor(date, symbols, interval) {
+        this.interval = interval
         this.symbols = symbols
         this.dateToBeginFetch = new Date(Date.parse(date))
+        console.info(this.dateToBeginFetch)
         this.currentSymbol = this.symbols.shift()
     }
     getArgs() {
@@ -20,11 +22,11 @@ class exchangeDownloader {
                 limit: loop.limit,
                 interval: loop.interval,
                 startTime: loop.currentFrame, 
-                endTime: loop.currentFrame + 501 * 1 * 60 * 1000
+                endTime: loop.currentFrame + 501 * intervalStep(this.interval)
             }
 
             loop.symbol = this.currentSymbol
-            loop.currentFrame += 500 * 1 * 60 * 1000
+            loop.currentFrame += 500 *  intervalStep(this.interval)
             loop.i++ 
             return x
         }
@@ -80,7 +82,7 @@ class exchangeDownloader {
         return {
             i: 0, // Initial state of the loop
             limit: 500,
-            interval: '1m',
+            interval: this.interval,
             endTime: Date.now(),
             startTime: this.dateToBeginFetch.getTime(),
             currentFrame: this.dateToBeginFetch.getTime()
